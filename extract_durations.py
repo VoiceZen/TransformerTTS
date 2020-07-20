@@ -28,6 +28,7 @@ if gpus:
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', dest='config', type=str)
+parser.add_argument('--use_csv', default=False)
 parser.add_argument('--session_name', dest='session_name', default=None)
 parser.add_argument('--recompute_pred', dest='recompute_pred', action='store_true',
                     help='Recompute the model predictions.')
@@ -84,10 +85,10 @@ if args.recompute_pred or (val_has_files == 0) or (train_has_files == 0):
         print('\nWARNING: storing predictions can take a lot of disk space (~40GB)\n')
     train_meta = config_manager.train_datadir / 'train_metafile.txt'
     test_meta = config_manager.train_datadir / 'test_metafile.txt'
-    train_samples, _ = load_files(metafile=str(train_meta),
+    train_samples, _ = load_files(args.use_csv,metafile=str(train_meta),
                                   meldir=str(meldir),
                                   num_samples=config['n_samples'])  # (phonemes, mel)
-    val_samples, _ = load_files(metafile=str(test_meta),
+    val_samples, _ = load_files(args.use_csv,metafile=str(test_meta),
                                 meldir=str(meldir),
                                 num_samples=config['n_samples'])  # (phonemes, text, mel)
     

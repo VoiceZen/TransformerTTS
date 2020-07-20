@@ -55,6 +55,7 @@ def validate(model,
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--config', dest='config', type=str)
+parser.add_argument('--use_csv', default=False)
 parser.add_argument('--reset_dir', dest='clear_dir', action='store_true',
                     help="deletes everything under this config's folder.")
 parser.add_argument('--reset_logs', dest='clear_logs', action='store_true',
@@ -71,10 +72,10 @@ config_manager.create_remove_dirs(clear_dir=args.clear_dir,
 config_manager.dump_config()
 config_manager.print_config()
 
-train_samples, _ = load_files(metafile=str(config_manager.train_datadir / 'train_metafile.txt'),
+train_samples, _ = load_files(args.use_csv,metafile=str(config_manager.train_datadir / 'train_metafile.txt'),
                               meldir=str(config_manager.train_datadir / 'mels'),
                               num_samples=config['n_samples'])  # (phonemes, mel)
-val_samples, _ = load_files(metafile=str(config_manager.train_datadir / 'test_metafile.txt'),
+val_samples, _ = load_files(args.use_csv,metafile=str(config_manager.train_datadir / 'test_metafile.txt'),
                             meldir=str(config_manager.train_datadir / 'mels'),
                             num_samples=config['n_samples'])  # (phonemes, text, mel)
 

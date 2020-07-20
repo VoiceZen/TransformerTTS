@@ -5,7 +5,7 @@ _suprasegmentals = 'ˈˌːˑ'
 _other_symbols = 'ʍwɥʜʢʡɕʑɺɧ'
 _diacrilics = 'ɚ˞ɫ'
 _phonemes = sorted(list(
-    _vowels + _non_pulmonic_consonants + _pulmonic_consonants + _suprasegmentals + _other_symbols + _diacrilics))
+    _vowels + _non_pulmonic_consonants + _pulmonic_consonants + _suprasegmentals + _other_symbols + _diacrilics) + ['ʰ', '̃', '̩'])
 _punctuations = '!,-.:;? '
 _alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäüöß'
 _not_end_punctuation = ',-.:; '

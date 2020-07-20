@@ -1,3 +1,4 @@
+import csv
 import os
 from random import Random
 
@@ -48,25 +49,49 @@ class Dataset:
         return (self.preprocessor(s) for s in samples)
 
 
-def load_files(metafile,
+def load_files(use_csv,metafile,
                meldir,
                num_samples=None):
     samples = []
     count = 0
     alphabet = set()
-    with open(metafile, 'r', encoding='utf-8') as f:
-        for l in f.readlines():
-            l_split = l.split('|')
-            mel_file = os.path.join(str(meldir), l_split[0] + '.npy')
-            text = l_split[1].strip().lower()
-            phonemes = l_split[2].strip()
-            samples.append((phonemes, text, mel_file))
-            alphabet.update(list(text))
-            count += 1
-            if num_samples is not None and count > num_samples:
-                break
-        alphabet = sorted(list(alphabet))
-        return samples, alphabet
+    
+    if(use_csv):
+        print('Reading metafile.csv !!')        
+        with open(metafile.split('.')[0] + '.csv', 'r', encoding='utf-8') as csvfile:
+            csvreader = csv.reader(csvfile)
+            first_line = next(csvreader)
+            print('Column names:')
+            print(first_line)
+            print()
+            for row in csvreader:
+                l_split = row
+                mel_file = os.path.join(str(meldir), l_split[0] + '.npy')
+                text = l_split[1].strip().lower()
+                phonemes = l_split[2].strip()
+                samples.append((phonemes, text, mel_file))
+                alphabet.update(list(text))
+                count += 1
+                if num_samples is not None and count > num_samples:
+                    break
+            alphabet = sorted(list(alphabet))
+            return samples, alphabet
+            
+    else:
+        print('Reading metafile.txt !!')
+        with open(metafile, 'r', encoding='utf-8') as f:
+            for l in f.readlines():
+                l_split = l.split('|')
+                mel_file = os.path.join(str(meldir), l_split[0] + '.npy')
+                text = l_split[1].strip().lower()
+                phonemes = l_split[2].strip()
+                samples.append((phonemes, text, mel_file))
+                alphabet.update(list(text))
+                count += 1
+                if num_samples is not None and count > num_samples:
+                    break
+            alphabet = sorted(list(alphabet))
+            return samples, alphabet
 
 
 class DataPrepper:

@@ -1,4 +1,5 @@
 import argparse
+import csv
 import os
 from pathlib import Path
 
@@ -48,13 +49,21 @@ else:
             filename, text = l_split[0], l_split[-1]
             if filename.endswith('.wav'):
                 filename = filename.split('.')[-1]
+
+            #if(config['phoneme_language']!='hi'):
             text = text_proc.cleaner(text)
+
             audio_data.append((filename, text))
     audio_data = np.array(audio_data)
     print('\nPhonemizing')
     
     texts = audio_data[:, 1]
-    batch_size = 250  # batch phonemization to avoid memory issues.
+
+    if(config['phoneme_language']!='hi'):
+        batch_size = 250  # batch phonemization to avoid memory issues.
+    else:
+        batch_size = 1
+
     phonemes = []
     for i in tqdm.tqdm(range(0, len(audio_data), batch_size)):
         batch = texts[i: i + batch_size]
@@ -80,12 +89,32 @@ with open(test_metafile, 'w+', encoding='utf-8') as test_f:
 with open(train_metafile, 'w+', encoding='utf-8') as train_f:
     train_f.writelines(train_lines)
 
+
+with open(test_metafile.split('.')[0] + '.csv', 'w', encoding='utf-8') as csvfile:
+        fieldnames = ['filename', 'text', 'phon']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for filename, text, phon in audio_data[:config['n_test']]:
+            writer.writerow({'filename': filename, 'text': text, 'phon': phon})
+
+
+with open(train_metafile.split('.')[0] + '.csv', 'w', encoding='utf-8') as csvfile:
+        fieldnames = ['filename', 'text', 'phon']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for filename, text, phon in audio_data[config['n_test']:-1]:
+            writer.writerow({'filename': filename, 'text': text, 'phon': phon})
+
 audio = Audio(config)
 for i in tqdm.tqdm(range(len(audio_data))):
     filename, _, _ = audio_data[i]
+    #print(filename)
     wav_path = os.path.join(args.WAV_DIR, filename + '.wav')
     y, sr = librosa.load(wav_path, sr=config['sampling_rate'])
+    #try:
     mel = audio.mel_spectrogram(y)
+    #except ValueError:
+    #    print('Error wavefile = {}'.format(filename))
     mel_path = os.path.join(mel_dir, filename)
     np.save(mel_path, mel.T)
 print('\nDone')
